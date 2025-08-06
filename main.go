@@ -23,25 +23,33 @@ func main() {
 
 	// Routes
 	mux.Handle("/", middleware.LoggingMiddleware(http.HandlerFunc(controllers.HomeController)))
-	
+
 	// SSE endpoint
 	mux.Handle("/events", middleware.LoggingMiddleware(http.HandlerFunc(controllers.SSEController)))
-	
+
 	// Polling endpoint
 	mux.Handle("/poll", middleware.LoggingMiddleware(http.HandlerFunc(controllers.PollController)))
-	
+
 	// Status endpoint for polling example
 	mux.Handle("/status", middleware.LoggingMiddleware(http.HandlerFunc(controllers.StatusController)))
-	
+
 	// Alternative SSE demo
 	mux.Handle("/sse-alt", middleware.LoggingMiddleware(http.HandlerFunc(controllers.SSEAlternativeController)))
-	
+
 	// SSE Debug page
 	mux.Handle("/sse-debug", middleware.LoggingMiddleware(http.HandlerFunc(controllers.SSEDebugController)))
-	
+
 	// Multi-event SSE demo
 	mux.Handle("/multi-events", middleware.LoggingMiddleware(http.HandlerFunc(controllers.SSEMultiEventController)))
 	mux.Handle("/sse-multi", middleware.LoggingMiddleware(http.HandlerFunc(controllers.SSEMultiEventPageController)))
+
+	// Real Example - OpenAI Integration
+	mux.Handle("/real-example", middleware.LoggingMiddleware(http.HandlerFunc(controllers.OpenAIExampleController)))
+	mux.Handle("/openai-poll", middleware.LoggingMiddleware(http.HandlerFunc(controllers.OpenAIPollController)))
+	mux.Handle("/openai-poll-status", middleware.LoggingMiddleware(http.HandlerFunc(controllers.OpenAIPollStatusController)))
+	mux.Handle("/openai-sse-start", middleware.LoggingMiddleware(http.HandlerFunc(controllers.OpenAISSEStartController)))
+	mux.Handle("/openai-sse", middleware.LoggingMiddleware(http.HandlerFunc(controllers.OpenAISSEController)))
+	mux.Handle("/openai-cleanup", middleware.LoggingMiddleware(http.HandlerFunc(controllers.OpenAICleanupController)))
 
 	log.Printf("Server starting on port %s", port)
 	if err := http.ListenAndServe(":"+port, mux); err != nil {

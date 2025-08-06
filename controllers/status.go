@@ -11,9 +11,9 @@ func StatusController(w http.ResponseWriter, r *http.Request) {
 	// Simulate some dynamic status
 	statuses := []string{"Online", "Processing", "Idle", "Active", "Busy"}
 	status := statuses[rand.Intn(len(statuses))]
-	
+
 	timestamp := time.Now().Format("15:04:05")
-	
+
 	// Return HTML fragment for HTMX to swap
 	w.Header().Set("Content-Type", "text/html")
 	fmt.Fprintf(w, `

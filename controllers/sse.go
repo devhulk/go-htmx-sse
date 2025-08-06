@@ -35,7 +35,7 @@ func SSEController(w http.ResponseWriter, r *http.Request) {
 			// Send periodic update
 			counter++
 			timestamp := time.Now().Format("15:04:05")
-			
+
 			// Send as HTML that HTMX can swap
 			fmt.Fprintf(w, "event: message\n")
 			fmt.Fprintf(w, "data: <div class=\"p-4 bg-blue-100 rounded\">Update #%d at %s</div>\n\n", counter, timestamp)

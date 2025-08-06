@@ -1,0 +1,197 @@
+package views
+
+templ OpenAIExample() {
+	@Layout("Real Example - OpenAI Integration") {
+		@OpenAIExampleContent()
+	}
+}
+
+templ OpenAIExampleContent() {
+	<div class="max-w-4xl mx-auto">
+		<h1 class="text-3xl font-bold text-gray-900 mb-8">Real Example: OpenAI Integration</h1>
+		
+		<div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-8">
+			<h3 class="font-semibold text-yellow-800 mb-2">Setup Required</h3>
+			<p class="text-yellow-700 text-sm">
+				To use this example, set your OpenAI API key as an environment variable:
+				<code class="bg-yellow-100 px-2 py-1 rounded text-xs ml-2">export OPENAI_API_KEY="your-api-key-here"</code>
+			</p>
+		</div>
+
+		<div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+			<!-- Polling Approach -->
+			<div class="bg-white rounded-lg shadow-md p-6">
+				<h2 class="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+					<span class="bg-orange-100 text-orange-800 px-2 py-1 rounded-full text-sm mr-3">POLLING</span>
+					Traditional Approach
+				</h2>
+				<p class="text-gray-600 mb-4 text-sm">
+					Submit request → Show loading → Poll for status → Display result
+				</p>
+				
+				<form hx-post="/openai-poll" hx-target="#poll-container" hx-swap="innerHTML">
+					<div class="mb-4">
+						<label for="poll-prompt" class="block text-sm font-medium text-gray-700 mb-2">
+							Enter your prompt:
+						</label>
+						<textarea 
+							name="prompt" 
+							id="poll-prompt"
+							rows="3" 
+							class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+							placeholder="Ask me anything..."></textarea>
+					</div>
+					<button 
+						type="submit" 
+						class="w-full bg-orange-600 text-white py-2 px-4 rounded-md hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 transition-colors">
+						Generate with Polling
+					</button>
+				</form>
+				
+				<div id="poll-container" class="mt-4 min-h-[100px]">
+					<!-- Poll results will appear here -->
+				</div>
+			</div>
+
+			<!-- SSE Approach -->
+			<div class="bg-white rounded-lg shadow-md p-6">
+				<h2 class="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+					<span class="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-sm mr-3">SSE</span>
+					Real-time Streaming
+				</h2>
+				<p class="text-gray-600 mb-4 text-sm">
+					Submit request → Stream response in real-time → Complete
+				</p>
+				
+				<form hx-post="/openai-sse-start" hx-target="#sse-container" hx-swap="innerHTML">
+					<div class="mb-4">
+						<label for="sse-prompt" class="block text-sm font-medium text-gray-700 mb-2">
+							Enter your prompt:
+						</label>
+						<textarea 
+							name="prompt" 
+							id="sse-prompt"
+							rows="3" 
+							class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+							placeholder="Ask me anything..."></textarea>
+					</div>
+					<button 
+						type="submit" 
+						class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors">
+						Generate with SSE
+					</button>
+				</form>
+				
+				<div id="sse-container" class="mt-4 min-h-[100px]">
+					<!-- SSE results will appear here -->
+				</div>
+			</div>
+		</div>
+
+		<!-- Comparison Section -->
+		<div class="mt-12 bg-gray-50 rounded-lg p-6">
+			<h2 class="text-xl font-semibold text-gray-800 mb-4">Approach Comparison</h2>
+			<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+				<div>
+					<h3 class="font-medium text-orange-800 mb-2 flex items-center">
+						<span class="bg-orange-100 px-2 py-1 rounded text-sm mr-2">POLLING</span>
+					</h3>
+					<ul class="text-sm text-gray-600 space-y-1">
+						<li>• Simple HTTP request/response cycle</li>
+						<li>• Shows loading state, then complete result</li>
+						<li>• Higher latency (wait { "for" } full completion)</li>
+						<li>• Less server resources during wait</li>
+						<li>• Better { "for" } longer processing tasks</li>
+					</ul>
+				</div>
+				<div>
+					<h3 class="font-medium text-blue-800 mb-2 flex items-center">
+						<span class="bg-blue-100 px-2 py-1 rounded text-sm mr-2">SSE</span>
+					</h3>
+					<ul class="text-sm text-gray-600 space-y-1">
+						<li>• Real-time streaming of partial results</li>
+						<li>• Immediate feedback and progressive display</li>
+						<li>• Better user experience (see progress)</li>
+						<li>• Persistent connection during generation</li>
+						<li>• Perfect { "for" } AI text generation</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+
+		<!-- Technical Implementation Notes -->
+		<div class="mt-8 bg-white rounded-lg shadow-md p-6">
+			<h2 class="text-xl font-semibold text-gray-800 mb-4">Implementation Details</h2>
+			<div class="prose prose-sm text-gray-600">
+				<h3 class="text-gray-800">Polling Implementation:</h3>
+				<ul>
+					<li>Form submission triggers background processing</li>
+					<li>Returns loading HTML with <code>hx-get</code> { "for" } status checks</li>
+					<li>Status endpoint returns updated HTML based on processing state</li>
+					<li>HTMX automatically handles the polling cycle</li>
+				</ul>
+				
+				<h3 class="text-gray-800 mt-4">SSE Implementation:</h3>
+				<ul>
+					<li>HTMX SSE extension manages the connection lifecycle</li>
+					<li>Different <code>sse-swap</code> elements listen { "for" } specific events</li>
+					<li>Server streams OpenAI tokens as SSE events</li>
+					<li>Real-time DOM updates without manual JavaScript</li>
+				</ul>
+			</div>
+		</div>
+
+		<!-- Comparison Section -->
+		<div class="mt-12 bg-gray-50 rounded-lg p-6">
+			<h2 class="text-xl font-semibold text-gray-800 mb-4">Approach Comparison</h2>
+			<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+				<div>
+					<h3 class="font-medium text-orange-800 mb-2 flex items-center">
+						<span class="bg-orange-100 px-2 py-1 rounded text-sm mr-2">POLLING</span>
+					</h3>
+					<ul class="text-sm text-gray-600 space-y-1">
+						<li>• Simple HTTP request/response cycle</li>
+						<li>• Shows loading state, then complete result</li>
+						<li>• Higher latency (wait for full completion)</li>
+						<li>• Less server resources during wait</li>
+						<li>• Better for longer processing tasks</li>
+					</ul>
+				</div>
+				<div>
+					<h3 class="font-medium text-blue-800 mb-2 flex items-center">
+						<span class="bg-blue-100 px-2 py-1 rounded text-sm mr-2">SSE</span>
+					</h3>
+					<ul class="text-sm text-gray-600 space-y-1">
+						<li>• Real-time streaming of partial results</li>
+						<li>• Immediate feedback and progressive display</li>
+						<li>• Better user experience (see progress)</li>
+						<li>• Persistent connection during generation</li>
+						<li>• Perfect for AI text generation</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+
+		<!-- Technical Implementation Notes -->
+		<div class="mt-8 bg-white rounded-lg shadow-md p-6">
+			<h2 class="text-xl font-semibold text-gray-800 mb-4">Implementation Details</h2>
+			<div class="prose prose-sm text-gray-600">
+				<h3 class="text-gray-800">Polling Implementation:</h3>
+				<ul>
+					<li>Form submission triggers background processing</li>
+					<li>Returns loading HTML with <code>hx-get</code> { "for" } status checks</li>
+					<li>Status endpoint returns updated HTML based on processing state</li>
+					<li>HTMX automatically handles the polling cycle</li>
+				</ul>
+				
+				<h3 class="text-gray-800 mt-4">SSE Implementation:</h3>
+				<ul>
+					<li>HTMX SSE extension manages the connection lifecycle</li>
+					<li>Different <code>sse-swap</code> elements listen for specific events</li>
+					<li>Server streams OpenAI tokens as SSE events</li>
+					<li>Real-time DOM updates without manual JavaScript</li>
+				</ul>
+			</div>
+		</div>
+	</div>
+}
