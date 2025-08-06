@@ -11,17 +11,21 @@ This project demonstrates real-time communication patterns in web applications:
 
 ## Tech Stack
 
-- **Backend**: Go (1.22+)
+- **Backend**: Go (1.22+) with standard library HTTP server
 - **Templating**: [Templ](https://templ.guide/) - Type-safe HTML templates
 - **Frontend**: [HTMX](https://htmx.org/) 2.0 - High-level hypermedia library
-- **Styling**: Tailwind CSS
-- **Hot Reload**: Air for Go, Templ watch mode
+- **Styling**: Tailwind CSS - Utility-first CSS framework
+- **AI Integration**: [OpenAI Go SDK](https://github.com/sashabaranov/go-openai) - For real-world SSE streaming examples
+- **Hot Reload**: Air for Go, Templ watch mode, Tailwind watch
+- **Architecture**: MVC pattern with controllers, views, and middleware
 
 ## Prerequisites
 
 - Go 1.22 or higher
 - Node.js and npm (for Tailwind CSS)
 - Templ CLI (`go install github.com/a-h/templ/cmd/templ@latest`)
+- Air for hot reload (`go install github.com/cosmtrek/air@latest`)
+- OpenAI API key (optional, for Real Example features)
 
 ## Installation
 
@@ -89,21 +93,29 @@ make build
 .
 ├── main.go              # Entry point and route definitions
 ├── controllers/         # HTTP handlers
-│   ├── home.go         # Home page controller
-│   ├── sse.go          # SSE endpoint
-│   ├── poll.go         # Polling examples
-│   └── status.go       # Status endpoint for polling
+│   ├── home.go         # Home page with HTMX navigation support
+│   ├── openai.go       # OpenAI integration (polling + SSE streaming)
+│   ├── poll.go         # Polling examples with different intervals
+│   ├── sse.go          # Basic SSE endpoint
+│   ├── sse_multi.go    # Multi-event SSE demonstrations
+│   └── status.go       # Status endpoint for polling examples
 ├── views/              # Templ templates
-│   ├── layout.templ    # Base layout
-│   ├── home.templ      # Home page template
-│   └── poll.templ      # Polling examples template
+│   ├── layout.templ    # Base layout with HTMX navigation
+│   ├── home.templ      # Home page with content separation
+│   ├── openai_example.templ # Real Example page (OpenAI integration)
+│   ├── poll.templ      # Polling examples
+│   ├── sse_multi.templ # Multi-event SSE demo
+│   └── sse_debug.templ # SSE debugging and testing page
 ├── middleware/         # HTTP middleware
-│   └── logging.go      # Request logging with Flusher support
-├── assets/            # Static files
+│   └── logging.go      # Request logging with Flusher support for SSE
+├── assets/             # Static files
 │   ├── css/           # Tailwind input files
-│   ├── js/            # HTMX and extensions
+│   ├── js/            # HTMX 2.0+ and SSE extension
 │   └── output.css     # Generated Tailwind output
-└── Makefile           # Build and development commands
+├── CLAUDE.md          # Detailed project documentation and patterns
+├── Makefile           # Build and development commands
+├── .air.toml          # Air hot reload configuration
+└── go.mod/go.sum      # Go module dependencies
 ```
 
 ## Important: HTMX SSE Gotchas
@@ -236,24 +248,28 @@ Benefits:
 
 ## Development Tips
 
-1. **Check browser console** - SSE connection issues and HTMX events are logged there
-2. **Use the debug page** (`/sse-debug`) to test different SSE configurations
-3. **Test SSE endpoint directly**: 
+1. **HTMX Navigation**: All navbar links use HTMX for fast client-side navigation
+2. **Template Generation**: Run `templ generate` after template changes  
+3. **SSE Debugging**: Use `/sse-debug` page and browser DevTools
+4. **Connection Monitoring**: Check console for connection count logs
+5. **Multiple Events**: Organize events by type (message, alert, status, etc.)
+6. **OpenAI Testing**: Use `/real-example` to test both polling and streaming approaches
+7. **SSE Cleanup**: Monitor server logs to ensure connections are properly closed
+8. **Check browser console** - SSE connection issues and HTMX events are logged there
+9. **Test SSE endpoint directly**: 
    ```bash
    curl -N -H "Accept: text/event-stream" http://localhost:8080/events
    ```
-4. **Ensure Templ files are regenerated** after changes:
-   ```bash
-   templ generate
-   ```
-5. **Monitor SSE connections** in browser DevTools:
-   - Network tab → Filter by "EventStream"
-   - See connection status, events received, and any errors
-6. **Use custom event types** to organize your real-time updates:
-   - `message` for general updates
-   - `alert` for notifications
-   - `status` for state changes
-   - Create your own domain-specific events
+10. **Monitor SSE connections** in browser DevTools:
+    - Network tab → Filter by "EventStream"
+    - See connection status, events received, and any errors
+11. **Use custom event types** to organize your real-time updates:
+    - `message` for general updates
+    - `alert` for notifications  
+    - `status` for state changes
+    - Create your own domain-specific events
+12. **Container Cleanup**: Use `hx-swap="outerHTML"` for SSE cleanup patterns
+13. **Polling Status**: Implement progressive status messages for better UX
 
 ## Troubleshooting
 
@@ -286,6 +302,28 @@ Benefits:
 - Ensure Templ watcher is running
 - Manually run `templ generate` if needed
 - Check for `*_templ.go` files being generated
+
+### OpenAI integration not working
+- Verify `OPENAI_API_KEY` environment variable is set
+- Check API key validity and quota
+- Monitor network requests in browser DevTools
+- Check server logs for OpenAI API errors
+
+### SSE connection keeps re-running
+- Ensure `sse-connect` element is removed from DOM after completion
+- Use `hx-swap="outerHTML"` to replace entire container
+- Avoid manual `sse-close` management
+- Check for duplicate SSE connector elements
+
+### Polling not showing progress updates
+- Verify polling interval is set correctly (1-2 seconds recommended)
+- Check that status endpoint returns different messages based on elapsed time
+- Ensure background processing is tracking start time properly
+
+### HTMX navigation issues
+- Controllers must detect `HX-Request` header and return content-only templates
+- Full page templates should only be used for direct requests
+- Check that navbar links have proper `hx-get` and `hx-target` attributes
 
 ## SSE Workflow Deep Dive
 
