@@ -20,8 +20,26 @@ templ Layout(title string) {
 							<h1 class="text-xl font-bold">Go HTMX SSE Demo</h1>
 						</div>
 						<div class="flex items-center space-x-4">
-							<a href="/" class="text-gray-700 hover:text-gray-900">Home</a>
-							<a href="/poll" class="text-gray-700 hover:text-gray-900">Polling</a>
+							<a href="/" 
+							   hx-get="/" 
+							   hx-target="main" 
+							   hx-push-url="true"
+							   class="text-gray-700 hover:text-gray-900">Home</a>
+							<a href="/poll" 
+							   hx-get="/poll" 
+							   hx-target="main" 
+							   hx-push-url="true"
+							   class="text-gray-700 hover:text-gray-900">Polling</a>
+							<a href="/sse-multi" 
+							   hx-get="/sse-multi" 
+							   hx-target="main" 
+							   hx-push-url="true"
+							   class="text-gray-700 hover:text-gray-900">Multi-Event SSE</a>
+							<a href="/sse-debug" 
+							   hx-get="/sse-debug" 
+							   hx-target="main" 
+							   hx-push-url="true"
+							   class="text-gray-700 hover:text-gray-900">Debug</a>
 						</div>
 					</div>
 				</div>
@@ -29,6 +47,24 @@ templ Layout(title string) {
 			<main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 				{ children... }
 			</main>
+			<script>
+				// Clean up SSE connections on page navigation
+				window.addEventListener('beforeunload', function() {
+					// Trigger HTMX to clean up SSE connections
+					document.body.dispatchEvent(new CustomEvent('htmx:beforeCleanupElement', {
+						detail: { elt: document.body }
+					}));
+				});
+
+				// Monitor SSE connections for debugging
+				document.body.addEventListener('htmx:sseOpen', function(evt) {
+					console.log('SSE Connection Opened');
+				});
+				
+				document.body.addEventListener('htmx:sseClose', function(evt) {
+					console.log('SSE Connection Closed');
+				});
+			</script>
 		</body>
 	</html>
 }

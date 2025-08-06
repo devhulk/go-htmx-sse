@@ -1,0 +1,104 @@
+package views
+
+templ SSEMultiEvent() {
+	@Layout("Multi-Event SSE Demo") {
+		@SSEMultiEventContent()
+	}
+}
+
+templ SSEMultiEventContent() {
+		<div class="space-y-8">
+			<div class="bg-white rounded-lg shadow p-6">
+				<h2 class="text-2xl font-bold mb-4">Multiple SSE Event Types</h2>
+				<p class="text-gray-600 mb-6">
+					This demo shows how to listen for different SSE event types using HTMX. 
+					The server sends three different event types: messages, alerts, and status updates.
+				</p>
+				
+				<!-- Single SSE connection for all listeners -->
+				<div hx-ext="sse" sse-connect="/multi-events">
+					<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+						<!-- Listen for 'message' events -->
+						<div class="border-2 border-dashed border-gray-300 rounded-lg p-4">
+							<h3 class="font-bold mb-2 text-blue-600">📨 Messages (every 2s)</h3>
+							<div class="text-sm text-gray-500 mb-2">Listening for 'message' events</div>
+							<div sse-swap="message" class="space-y-2 max-h-40 overflow-y-auto">
+								<div class="text-gray-400">Waiting for messages...</div>
+							</div>
+						</div>
+
+						<!-- Listen for 'alert' events -->
+						<div class="border-2 border-dashed border-gray-300 rounded-lg p-4">
+							<h3 class="font-bold mb-2 text-yellow-600">🔔 Alerts (every 5s)</h3>
+							<div class="text-sm text-gray-500 mb-2">Listening for 'alert' events</div>
+							<div sse-swap="alert" class="space-y-2 max-h-40 overflow-y-auto">
+								<div class="text-gray-400">Waiting for alerts...</div>
+							</div>
+						</div>
+
+						<!-- Listen for 'status' events -->
+						<div class="border-2 border-dashed border-gray-300 rounded-lg p-4">
+							<h3 class="font-bold mb-2 text-green-600">🚦 Status Updates (every 3s)</h3>
+							<div class="text-sm text-gray-500 mb-2">Listening for 'status' events</div>
+							<div sse-swap="status" class="flex flex-wrap gap-2">
+								<span class="text-gray-400">Waiting for status...</span>
+							</div>
+						</div>
+
+						<!-- Listen for multiple events in one element -->
+						<div class="border-2 border-dashed border-gray-300 rounded-lg p-4">
+							<h3 class="font-bold mb-2 text-purple-600">🎯 Multiple Events</h3>
+							<div class="text-sm text-gray-500 mb-2">Listening for 'message,alert' events</div>
+							<div sse-swap="message,alert" class="space-y-2 max-h-40 overflow-y-auto">
+								<div class="text-gray-400">Waiting for messages or alerts...</div>
+							</div>
+						</div>
+
+						<!-- Listen for 'connected' event -->
+						<div class="border-2 border-dashed border-gray-300 rounded-lg p-4">
+							<h3 class="font-bold mb-2 text-gray-600">🔌 Connection Status</h3>
+							<div class="text-sm text-gray-500 mb-2">Listening for 'connected' event</div>
+							<div sse-swap="connected">
+								<div class="text-gray-400">Not connected</div>
+							</div>
+						</div>
+
+						<!-- Using hx-trigger with custom SSE events -->
+						<div class="border-2 border-dashed border-gray-300 rounded-lg p-4">
+							<h3 class="font-bold mb-2 text-indigo-600">⚡ Trigger on Alert</h3>
+							<div class="text-sm text-gray-500 mb-2">Uses hx-trigger="sse:alert"</div>
+							<div hx-trigger="sse:alert" 
+								 hx-get="/status" 
+								 hx-swap="innerHTML"
+								 class="p-2 bg-gray-100 rounded">
+								Waiting for alert to trigger status fetch...
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="mt-6 p-4 bg-gray-50 rounded">
+					<h3 class="font-bold mb-2">How it works:</h3>
+					<ul class="space-y-2 text-sm">
+						<li>• <code class="bg-gray-200 px-1 rounded">sse-swap="message"</code> - Listens only for 'message' events</li>
+						<li>• <code class="bg-gray-200 px-1 rounded">sse-swap="alert"</code> - Listens only for 'alert' events</li>
+						<li>• <code class="bg-gray-200 px-1 rounded">sse-swap="status"</code> - Listens only for 'status' events</li>
+						<li>• <code class="bg-gray-200 px-1 rounded">sse-swap="message,alert"</code> - Listens for multiple event types</li>
+						<li>• <code class="bg-gray-200 px-1 rounded">hx-trigger="sse:alert"</code> - Triggers HTMX request on SSE event</li>
+					</ul>
+				</div>
+
+				<div class="mt-4 p-4 bg-blue-50 rounded">
+					<h3 class="font-bold mb-2">Server Event Format:</h3>
+					<pre class="text-xs bg-white p-2 rounded overflow-x-auto">event: message
+data: &lt;div&gt;Message content&lt;/div&gt;
+
+event: alert
+data: &lt;div&gt;Alert content&lt;/div&gt;
+
+event: status
+data: &lt;div&gt;Status content&lt;/div&gt;</pre>
+				</div>
+			</div>
+		</div>
+}

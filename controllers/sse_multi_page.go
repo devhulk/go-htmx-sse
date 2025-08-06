@@ -6,11 +6,11 @@ import (
 	"github.com/devhulk/go-htmx-sse/views"
 )
 
-func SSEDebugController(w http.ResponseWriter, r *http.Request) {
+func SSEMultiEventPageController(w http.ResponseWriter, r *http.Request) {
 	// Check if this is an HTMX request
 	if r.Header.Get("HX-Request") == "true" {
 		// Return just the main content
-		component := views.SSEDebugContent()
+		component := views.SSEMultiEventContent()
 		err := component.Render(r.Context(), w)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -18,7 +18,7 @@ func SSEDebugController(w http.ResponseWriter, r *http.Request) {
 		}
 	} else {
 		// Return full page with layout
-		component := views.SSEDebug()
+		component := views.SSEMultiEvent()
 		err := component.Render(r.Context(), w)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)

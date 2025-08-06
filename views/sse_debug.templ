@@ -2,6 +2,11 @@ package views
 
 templ SSEDebug() {
 	@Layout("SSE Debug") {
+		@SSEDebugContent()
+	}
+}
+
+templ SSEDebugContent() {
 		<div class="space-y-8">
 			<div class="bg-white rounded-lg shadow p-6">
 				<h2 class="text-2xl font-bold mb-4">HTMX SSE Debug</h2>
@@ -50,20 +55,42 @@ templ SSEDebug() {
 				</div>
 
 				<script>
-					// Debug script to check what's loaded
-					document.addEventListener('DOMContentLoaded', function() {
+					// Debug script to check what's loaded - runs immediately
+					function initializeDebug() {
 						// Check HTMX version
-						document.getElementById('htmx-version').innerText = htmx.version || 'Not loaded';
+						const versionEl = document.getElementById('htmx-version');
+						if (versionEl) {
+							versionEl.innerText = htmx.version || 'Not loaded';
+						}
 						
 						// Check if SSE extension is loaded
-						const sseLoaded = htmx.defineExtension && document.querySelector('[hx-ext*="sse"]') ? 'Yes' : 'No';
-						document.getElementById('sse-loaded').innerText = sseLoaded;
+						const sseLoadedEl = document.getElementById('sse-loaded');
+						if (sseLoadedEl) {
+							const sseLoaded = htmx.defineExtension && document.querySelector('[hx-ext*="sse"]') ? 'Yes' : 'No';
+							sseLoadedEl.innerText = sseLoaded;
+						}
 						
-						// Listen for HTMX events
+						// Reset event counter
+						const countEl = document.getElementById('event-count');
+						if (countEl) {
+							countEl.innerText = '0';
+						}
+					}
+
+					// Run immediately
+					initializeDebug();
+
+					// Also run after HTMX content loads
+					document.addEventListener('htmx:afterSettle', initializeDebug);
+
+					// Listen for HTMX events (these stay on document.body)
+					if (!document.body._sseDebugListenersAdded) {
 						document.body.addEventListener('htmx:sseMessage', function(evt) {
 							console.log('SSE Message received:', evt);
 							const countEl = document.getElementById('event-count');
-							countEl.innerText = parseInt(countEl.innerText) + 1;
+							if (countEl) {
+								countEl.innerText = parseInt(countEl.innerText) + 1;
+							}
 						});
 						
 						document.body.addEventListener('htmx:sseOpen', function(evt) {
@@ -86,9 +113,11 @@ templ SSEDebug() {
 						document.body.addEventListener('htmx:afterRequest', function(evt) {
 							console.log('HTMX afterRequest:', evt);
 						});
-					});
+
+						// Mark listeners as added to avoid duplicates
+						document.body._sseDebugListenersAdded = true;
+					}
 				</script>
 			</div>
 		</div>
-	}
 }

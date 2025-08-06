@@ -75,6 +75,7 @@ make build
 - `/poll` - Advanced polling examples with different intervals
 - `/sse-alt` - Alternative SSE implementation using vanilla JavaScript
 - `/sse-debug` - Debug page for testing different SSE configurations
+- `/sse-multi` - Multiple SSE event types demonstration
 
 ## Project Structure
 
@@ -161,6 +162,72 @@ w.(http.Flusher).Flush()
 
 Browsers limit the number of SSE connections per domain (typically 6). Keep this in mind when designing applications with multiple SSE streams.
 
+### Multiple Event Types with HTMX SSE
+
+**Problem**: You want to handle different types of SSE events (not just "message" events) and route them to different parts of your UI.
+
+**Solution**: Use custom event names and the `sse-swap` attribute:
+
+```go
+// Server sends different event types
+fmt.Fprintf(w, "event: message\n")
+fmt.Fprintf(w, "data: <div>Regular message</div>\n\n")
+
+fmt.Fprintf(w, "event: alert\n")  
+fmt.Fprintf(w, "data: <div>Alert notification</div>\n\n")
+
+fmt.Fprintf(w, "event: status\n")
+fmt.Fprintf(w, "data: <div>Status update</div>\n\n")
+```
+
+```html
+<!-- Client listens for specific events -->
+<div hx-ext="sse" sse-connect="/events">
+    <!-- Only receives "message" events -->
+    <div sse-swap="message">...</div>
+    
+    <!-- Only receives "alert" events -->
+    <div sse-swap="alert">...</div>
+    
+    <!-- Receives both "message" and "alert" events -->
+    <div sse-swap="message,alert">...</div>
+    
+    <!-- Triggers HTMX request when "alert" event arrives -->
+    <div hx-trigger="sse:alert" hx-get="/handle-alert">...</div>
+</div>
+```
+
+### Single Connection for Multiple Listeners
+
+**Problem**: Creating multiple SSE connections (`sse-connect`) on the same page causes errors and hits browser connection limits.
+
+**Solution**: Use a single parent element with `sse-connect` and multiple child elements with `sse-swap`:
+
+❌ **Wrong - Multiple connections:**
+```html
+<div hx-ext="sse" sse-connect="/events">
+    <div sse-swap="message">Messages here</div>
+</div>
+<div hx-ext="sse" sse-connect="/events">  <!-- Creates another connection! -->
+    <div sse-swap="alert">Alerts here</div>
+</div>
+```
+
+✅ **Correct - Single connection:**
+```html
+<div hx-ext="sse" sse-connect="/events">  <!-- Single connection -->
+    <div sse-swap="message">Messages here</div>
+    <div sse-swap="alert">Alerts here</div>
+    <div sse-swap="status">Status here</div>
+</div>
+```
+
+Benefits:
+- More efficient - uses only one connection
+- Avoids browser connection limits
+- All listeners share the same EventSource
+- Cleaner architecture
+
 ## Development Tips
 
 1. **Check browser console** - SSE connection issues and HTMX events are logged there
@@ -173,6 +240,14 @@ Browsers limit the number of SSE connections per domain (typically 6). Keep this
    ```bash
    templ generate
    ```
+5. **Monitor SSE connections** in browser DevTools:
+   - Network tab → Filter by "EventStream"
+   - See connection status, events received, and any errors
+6. **Use custom event types** to organize your real-time updates:
+   - `message` for general updates
+   - `alert` for notifications
+   - `status` for state changes
+   - Create your own domain-specific events
 
 ## Troubleshooting
 
@@ -184,6 +259,18 @@ Browsers limit the number of SSE connections per domain (typically 6). Keep this
 - Check browser console for errors
 - Verify the `/events` endpoint is accessible
 - Ensure middleware implements `http.Flusher`
+- Check if you have multiple `sse-connect` attributes (should only have one per connection)
+
+### Multiple SSE connection errors
+- Look for multiple `sse-connect` attributes on the same page
+- Consolidate to a single parent element with `sse-connect`
+- Child elements should only have `sse-swap` attributes
+
+### Events not being received
+- Verify event names match between server and client
+- Server: `fmt.Fprintf(w, "event: myevent\n")`
+- Client: `<div sse-swap="myevent">`
+- Check browser DevTools Network tab for EventStream data
 
 ### Styling not updating
 - Make sure Tailwind watcher is running (`make live` includes this)

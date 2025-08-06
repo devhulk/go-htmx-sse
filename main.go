@@ -38,6 +38,10 @@ func main() {
 	
 	// SSE Debug page
 	mux.Handle("/sse-debug", middleware.LoggingMiddleware(http.HandlerFunc(controllers.SSEDebugController)))
+	
+	// Multi-event SSE demo
+	mux.Handle("/multi-events", middleware.LoggingMiddleware(http.HandlerFunc(controllers.SSEMultiEventController)))
+	mux.Handle("/sse-multi", middleware.LoggingMiddleware(http.HandlerFunc(controllers.SSEMultiEventPageController)))
 
 	log.Printf("Server starting on port %s", port)
 	if err := http.ListenAndServe(":"+port, mux); err != nil {
