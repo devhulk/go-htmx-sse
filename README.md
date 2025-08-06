@@ -112,7 +112,7 @@ make build
 │   ├── css/           # Tailwind input files
 │   ├── js/            # HTMX 2.0+ and SSE extension
 │   └── output.css     # Generated Tailwind output
-├── CLAUDE.md          # Detailed project documentation and patterns
+├── docs.md            # Detailed project documentation and patterns
 ├── Makefile           # Build and development commands
 ├── .air.toml          # Air hot reload configuration
 └── go.mod/go.sum      # Go module dependencies
