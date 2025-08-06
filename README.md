@@ -2,6 +2,23 @@
 
 A demonstration project showcasing Server-Sent Events (SSE) and polling patterns using Go, HTMX, and Templ.
 
+## Screenshots
+
+### Home Page - SSE and Polling Comparison
+![Home Page](img/home.png)
+
+### Real-World Example - OpenAI Integration
+![OpenAI Integration](img/real-world.png)
+
+### Advanced Polling Examples
+![Polling Examples](img/polling.png)
+
+### Multiple SSE Event Types
+![Multiple Events](img/multiple.png)
+
+### SSE Debug Page
+![Debug Page](img/debug.png)
+
 ## Overview
 
 This project demonstrates real-time communication patterns in web applications:
