@@ -1,0 +1,64 @@
+package views
+
+templ Home() {
+	@Layout("SSE Demo") {
+		<div class="space-y-8">
+			<div class="bg-white rounded-lg shadow p-6">
+				<h2 class="text-2xl font-bold mb-4">Server-Sent Events Demo</h2>
+				<p class="text-gray-600 mb-4">
+					This demo shows real-time updates from the server using SSE.
+					The server sends a new update every 2 seconds.
+				</p>
+				
+				<div class="border-2 border-dashed border-gray-300 rounded-lg p-4">
+					<div hx-ext="sse" sse-connect="/events" sse-swap="message" hx-swap="innerHTML" hx-target="#sse-messages">
+						<div id="sse-messages">
+							<div class="text-gray-500">Connecting to SSE stream...</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="bg-white rounded-lg shadow p-6">
+				<h2 class="text-2xl font-bold mb-4">Polling Demo</h2>
+				<p class="text-gray-600 mb-4">
+					This demo shows periodic updates using HTMX polling.
+					The client polls the server every 3 seconds for status updates.
+				</p>
+				
+				<div class="border-2 border-dashed border-gray-300 rounded-lg p-4">
+					<div id="poll-status" 
+						 hx-get="/status" 
+						 hx-trigger="every 3s"
+						 hx-swap="innerHTML">
+						<div class="text-gray-500">Loading status...</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="bg-white rounded-lg shadow p-6">
+				<h2 class="text-2xl font-bold mb-4">Comparison</h2>
+				<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+					<div>
+						<h3 class="font-semibold mb-2">SSE Advantages:</h3>
+						<ul class="list-disc list-inside text-sm text-gray-600 space-y-1">
+							<li>Server pushes updates (no polling overhead)</li>
+							<li>Automatic reconnection</li>
+							<li>Lower latency for real-time updates</li>
+							<li>More efficient for frequent updates</li>
+						</ul>
+					</div>
+					<div>
+						<h3 class="font-semibold mb-2">Polling Advantages:</h3>
+						<ul class="list-disc list-inside text-sm text-gray-600 space-y-1">
+							<li>Works with any HTTP endpoint</li>
+							<li>Simpler server implementation</li>
+							<li>Works through all proxies</li>
+							<li>Better for infrequent updates</li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+	}
+}

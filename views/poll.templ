@@ -1,0 +1,45 @@
+package views
+
+templ PollExample() {
+	@Layout("Polling Example") {
+		<div class="bg-white rounded-lg shadow p-6">
+			<h2 class="text-2xl font-bold mb-4">Advanced Polling Example</h2>
+			
+			<div class="space-y-4">
+				<div class="p-4 bg-gray-100 rounded">
+					<h3 class="font-semibold mb-2">Auto-refresh Status (every 2 seconds)</h3>
+					<div id="fast-poll" 
+						 hx-get="/status" 
+						 hx-trigger="every 2s"
+						 hx-swap="innerHTML">
+						<div class="text-gray-500">Initializing...</div>
+					</div>
+				</div>
+
+				<div class="p-4 bg-gray-100 rounded">
+					<h3 class="font-semibold mb-2">Slow Poll (every 10 seconds)</h3>
+					<div id="slow-poll" 
+						 hx-get="/status" 
+						 hx-trigger="every 10s"
+						 hx-swap="innerHTML">
+						<div class="text-gray-500">Waiting for first update...</div>
+					</div>
+				</div>
+
+				<div class="p-4 bg-gray-100 rounded">
+					<h3 class="font-semibold mb-2">Manual Refresh</h3>
+					<button 
+						hx-get="/status" 
+						hx-target="#manual-status"
+						hx-swap="innerHTML"
+						class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 mb-2">
+						Refresh Status
+					</button>
+					<div id="manual-status">
+						<div class="text-gray-500">Click button to fetch status</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	}
+}

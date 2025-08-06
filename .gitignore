@@ -1,0 +1,34 @@
+# Air tmp directory
+tmp/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# IDE directories
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Node modules (if using npm for Tailwind/HTMX)
+node_modules/
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Generated files
+*_templ.go
+*_templ.txt
+assets/output.css
+assets/output2.css
+
+# Claude configuration
+CLAUDE.md
+

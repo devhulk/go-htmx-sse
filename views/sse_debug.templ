@@ -1,0 +1,94 @@
+package views
+
+templ SSEDebug() {
+	@Layout("SSE Debug") {
+		<div class="space-y-8">
+			<div class="bg-white rounded-lg shadow p-6">
+				<h2 class="text-2xl font-bold mb-4">HTMX SSE Debug</h2>
+				<p class="text-gray-600 mb-4">
+					Testing different HTMX SSE configurations to find what works.
+				</p>
+				
+				<div class="space-y-4">
+					<!-- Test 1: Simplest possible SSE setup -->
+					<div class="border-2 border-dashed border-gray-300 rounded-lg p-4">
+						<h3 class="font-bold mb-2">Test 1: Basic SSE with sse-swap on parent</h3>
+						<div hx-ext="sse" sse-connect="/events" sse-swap="message" class="p-4 bg-gray-100 rounded">
+							Waiting for messages...
+						</div>
+					</div>
+
+					<!-- Test 2: SSE with explicit target -->
+					<div class="border-2 border-dashed border-gray-300 rounded-lg p-4">
+						<h3 class="font-bold mb-2">Test 2: SSE with child element</h3>
+						<div hx-ext="sse" sse-connect="/events">
+							<div sse-swap="message" class="p-4 bg-gray-100 rounded">
+								Waiting for messages...
+							</div>
+						</div>
+					</div>
+
+					<!-- Test 3: Using hx-trigger with SSE -->
+					<div class="border-2 border-dashed border-gray-300 rounded-lg p-4">
+						<h3 class="font-bold mb-2">Test 3: Using hx-trigger with SSE</h3>
+						<div hx-ext="sse" sse-connect="/events">
+							<div hx-trigger="sse:message" hx-get="/status" hx-swap="innerHTML" class="p-4 bg-gray-100 rounded">
+								Waiting for SSE trigger...
+							</div>
+						</div>
+					</div>
+
+					<!-- Test 4: Manual inspection -->
+					<div class="border-2 border-dashed border-gray-300 rounded-lg p-4">
+						<h3 class="font-bold mb-2">Test 4: Debug Info</h3>
+						<div id="debug-info" class="p-4 bg-gray-100 rounded font-mono text-sm">
+							<div>HTMX Version: <span id="htmx-version"></span></div>
+							<div>SSE Extension Loaded: <span id="sse-loaded"></span></div>
+							<div>Events Received: <span id="event-count">0</span></div>
+						</div>
+					</div>
+				</div>
+
+				<script>
+					// Debug script to check what's loaded
+					document.addEventListener('DOMContentLoaded', function() {
+						// Check HTMX version
+						document.getElementById('htmx-version').innerText = htmx.version || 'Not loaded';
+						
+						// Check if SSE extension is loaded
+						const sseLoaded = htmx.defineExtension && document.querySelector('[hx-ext*="sse"]') ? 'Yes' : 'No';
+						document.getElementById('sse-loaded').innerText = sseLoaded;
+						
+						// Listen for HTMX events
+						document.body.addEventListener('htmx:sseMessage', function(evt) {
+							console.log('SSE Message received:', evt);
+							const countEl = document.getElementById('event-count');
+							countEl.innerText = parseInt(countEl.innerText) + 1;
+						});
+						
+						document.body.addEventListener('htmx:sseOpen', function(evt) {
+							console.log('SSE Connection opened:', evt);
+						});
+						
+						document.body.addEventListener('htmx:sseClose', function(evt) {
+							console.log('SSE Connection closed:', evt);
+						});
+						
+						document.body.addEventListener('htmx:sseError', function(evt) {
+							console.log('SSE Error:', evt);
+						});
+
+						// Log all HTMX events for debugging
+						document.body.addEventListener('htmx:beforeRequest', function(evt) {
+							console.log('HTMX beforeRequest:', evt);
+						});
+						
+						document.body.addEventListener('htmx:afterRequest', function(evt) {
+							console.log('HTMX afterRequest:', evt);
+						});
+					});
+				</script>
+			</div>
+		</div>
+	}
+}

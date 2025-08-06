@@ -1,0 +1,17 @@
+{
+  "name": "go-htmx-sse",
+  "version": "1.0.0",
+  "description": "Go HTMX SSE demo project",
+  "scripts": {
+    "dev": "make live",
+    "build": "make build",
+    "tailwind:watch": "tailwindcss -i ./assets/css/input.css -o ./assets/output.css --watch",
+    "tailwind:build": "tailwindcss -i ./assets/css/input.css -o ./assets/output.css --minify"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.19",
+    "postcss": "^8.4.38",
+    "postcss-cli": "^11.0.0",
+    "tailwindcss": "^3.4.1"
+  }
+}

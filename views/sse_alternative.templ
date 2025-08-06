@@ -1,0 +1,64 @@
+package views
+
+templ SSEAlternative() {
+	@Layout("SSE Alternative Demo") {
+		<div class="space-y-8">
+			<div class="bg-white rounded-lg shadow p-6">
+				<h2 class="text-2xl font-bold mb-4">Alternative SSE Implementation</h2>
+				<p class="text-gray-600 mb-4">
+					This uses a different approach with EventSource directly in JavaScript.
+				</p>
+				
+				<div class="border-2 border-dashed border-gray-300 rounded-lg p-4">
+					<div id="sse-output">
+						<div class="text-gray-500">Connecting to SSE stream...</div>
+					</div>
+				</div>
+
+				<button 
+					onclick="startSSE()" 
+					class="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+					Start SSE
+				</button>
+				<button 
+					onclick="stopSSE()" 
+					class="ml-2 bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">
+					Stop SSE
+				</button>
+			</div>
+
+			<script>
+				let eventSource = null;
+
+				function startSSE() {
+					if (eventSource) {
+						eventSource.close();
+					}
+					
+					eventSource = new EventSource('/events');
+					const output = document.getElementById('sse-output');
+					
+					eventSource.addEventListener('message', function(event) {
+						output.innerHTML = event.data;
+					});
+					
+					eventSource.onerror = function(error) {
+						console.error('SSE error:', error);
+						output.innerHTML = '<div class="text-red-500">Connection error</div>';
+					};
+				}
+
+				function stopSSE() {
+					if (eventSource) {
+						eventSource.close();
+						eventSource = null;
+						document.getElementById('sse-output').innerHTML = '<div class="text-gray-500">Disconnected</div>';
+					}
+				}
+
+				// Auto-start on page load
+				window.addEventListener('load', startSSE);
+			</script>
+		</div>
+	}
+}
